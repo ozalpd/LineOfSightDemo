@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AIController : MonoBehaviour
+public class NpcController : MonoBehaviour
 {
     public Transform target;
 
@@ -19,7 +19,7 @@ public class AIController : MonoBehaviour
     public float farSightAngle = 60f;
 
     [Tooltip("Near Sight begining distance. When target gets closer than this distance sight angle increases.")]
-    [Range(1f, 10f)]
+    [Range(1f, 30f)]
     public float nearSightDist = 8f;
     [Tooltip("Near Sight Angle. This is maximum sight angle if distance to target will be zero.")]
     [Range(5f, 360f)]
@@ -62,21 +62,27 @@ public class AIController : MonoBehaviour
             if (direction.magnitude > shootDist)
             {
                 if (State != NpcState.Chasing)
+                {
                     anim.SetTrigger("isRunning");
-                State = NpcState.Chasing;
+                    State = NpcState.Chasing;
+                }
             }
             else
             {
                 if (State != NpcState.Attacking)
+                {
                     anim.SetTrigger("isShooting");
-                State = NpcState.Chasing;
+                    State = NpcState.Attacking;
+                }
             }
         }
         else
         {
             if (State != NpcState.Idle)
+            {
                 anim.SetTrigger("isIdle");
-            State = NpcState.Idle;
+                State = NpcState.Idle;
+            }
         }
 
         if (State == NpcState.Chasing)
