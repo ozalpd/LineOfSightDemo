@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class AIController : MonoBehaviour
 {
-
     public Transform target;
 
     public float rotationSpeed = 2f;
@@ -26,16 +25,17 @@ public class AIController : MonoBehaviour
     [Range(5f, 360f)]
     public float nearSightAngle = 180f;
 
-    string state = "IDLE"; //TODO:Make this an enum
+    public NpcState State { get; private set; }
 
-    Animator anim;
+    private Animator anim;
 
     private void Awake()
     {
         anim = GetComponent<Animator>();
+        State = NpcState.Idle;
     }
 
-    void Update()
+    private void Update()
     {
         direction = target.position.With(y: transform.position.y) - transform.position;
         angle = Vector3.Angle(direction, transform.forward);
@@ -55,35 +55,35 @@ public class AIController : MonoBehaviour
 
         if (direction.magnitude < visibleDist && angle < sightAngle)
         {
-            //direction.y = transform.position.y;
             transform.rotation = Quaternion.Slerp(transform.rotation,
                                                   Quaternion.LookRotation(direction),
                                                   rotationSpeed * Time.deltaTime);
 
             if (direction.magnitude > shootDist)
             {
-                if (state != "RUNNING")
+                if (State != NpcState.Chasing)
                     anim.SetTrigger("isRunning");
-                state = "RUNNING";
+                State = NpcState.Chasing;
             }
             else
             {
-                if (state != "SHOOTING")
+                if (State != NpcState.Attacking)
                     anim.SetTrigger("isShooting");
-                state = "SHOOTING";
+                State = NpcState.Chasing;
             }
         }
         else
         {
-            if (state != "IDLE")
+            if (State != NpcState.Idle)
                 anim.SetTrigger("isIdle");
-            state = "IDLE";
+            State = NpcState.Idle;
         }
 
-        if (state == "RUNNING")
+        if (State == NpcState.Chasing)
             transform.Translate(0, 0, Time.deltaTime * speed);
     }
-    Vector3 direction;
-    float sightAngle;
-    float angle;
+
+    private Vector3 direction;
+    private float sightAngle;
+    private float angle;
 }
